@@ -1,13 +1,21 @@
-
-name: Simple Pipeline
+name: Docker Build and Push
 
 on:
   push:
 
 jobs:
-  build:
+  docker:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Print message
-        run: echo "Build successful"
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/my-app .
+
+      - name: Push Docker image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/my-app
